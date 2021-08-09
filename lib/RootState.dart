@@ -7,6 +7,7 @@ import 'CardState.dart';
 class RootState extends ChangeNotifier {
   final Map<String, List<CardState>> _cardStates = {};
 
+  // Get data from DB
   RootState() {
     for (int i = 0; i < 5; i++) {
       var mainCategoryId = 'Main Category $i';

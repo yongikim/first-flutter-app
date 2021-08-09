@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.dart' show Consumer;
+import 'package:sqflite/sqflite.dart';
 
 import 'MainAppBar.dart';
 import 'MainCategorySection.dart';
@@ -10,13 +11,15 @@ class Home extends StatefulWidget {
   final String title;
 
   @override
-  _HomeState createState() => _HomeState();
+  HomeState createState() => HomeState();
 }
 
-class _HomeState extends State<Home> {
+class HomeState extends State<Home> {
   int _counter = 0;
 
-  void _incrementCounter() {
+  void _incrementCounter() async {
+    final path = await getDatabasesPath();
+    print(path);
     setState(() {
       _counter++;
     });
