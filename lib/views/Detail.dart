@@ -1,18 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'CardState.dart';
+import '../view_models/CardState.dart';
 
 class Detail extends StatelessWidget {
-  final String mainCategoryId;
   final CardState cardState;
 
-  Detail(this.mainCategoryId, this.cardState);
+  Detail(this.cardState);
 
   @override
   Widget build(BuildContext context) {
-    final String heroTag = this.mainCategoryId + this.cardState.subCategory.id;
-    final String cardName = this.cardState.subCategory.name;
+    final String heroTag = this.cardState.category.id.toString() +
+        this.cardState.label.id.toString();
+    final String cardName = this.cardState.label.name;
     double statusBarHeight = MediaQuery.of(context).padding.top;
 
     void onHorizontalDragDown(DragDownDetails _) {

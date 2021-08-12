@@ -9,7 +9,9 @@ class App extends StatelessWidget {
       title: 'Grid List',
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
-      home: Home(title: 'Grid List'),
+      home: Home(
+        title: 'Grid List',
+      ),
     );
   }
 }

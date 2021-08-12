@@ -1,46 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart' show Consumer;
-import 'package:sqflite/sqflite.dart';
+import 'package:provider/provider.dart' show Consumer, Provider;
 
 import 'MainAppBar.dart';
 import 'MainCategorySection.dart';
-import 'RootState.dart';
+import '../view_models/HomeViewModel.dart';
 
-class Home extends StatefulWidget {
+class Home extends StatelessWidget {
   Home({Key? key, required this.title}) : super(key: key);
   final String title;
 
-  @override
-  HomeState createState() => HomeState();
-}
-
-class HomeState extends State<Home> {
-  int _counter = 0;
-
   void _incrementCounter() async {
-    final path = await getDatabasesPath();
-    print(path);
-    setState(() {
-      _counter++;
-    });
+    print('+');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<RootState>(
-      builder: (context, rootState, child) {
-        var cardStates = rootState.cardStates;
-        var sections = [];
-        cardStates.forEach((key, value) {
-          sections.add(MainCategorySection(key, value));
-        });
+    return Consumer<HomeViewModel>(
+      builder: (context, homeViewModel, child) {
+        final vm = Provider.of<HomeViewModel>(context);
 
+        if (vm.isLoading) {
+          return Text("Loading...");
+        }
+
+        final sections = vm.state.entries
+            .map((e) => MainCategorySection(e.key.toString(), e.value));
         return Scaffold(
           body: SafeArea(
             child: CustomScrollView(
               slivers: [
                 MainAppBar(title: 'Main App Bar'),
-                ...sections,
+                sections.first,
               ],
             ),
           ),
