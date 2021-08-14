@@ -1,28 +1,28 @@
 import 'package:first_flutter_app/models/Record.dart';
 
 abstract class RecordRepositoryInterface {
-  Future<CreateRecordResponse> create(CreateRecordRequest record);
+  Future<Record> create(CreateRecordReq record);
   Future<List<Record>> getRecordsByMonth(int month, int categoryId,
       [int labelId]);
 }
 
-class CreateRecordResponse {}
-
-class CreateRecordRequest {
+class CreateRecordReq {
   final double amount;
   final int categoryId;
   final int labelId;
-  final DateTime createdAt;
+  final int month;
+  final int day;
 
-  CreateRecordRequest(
-      this.amount, this.categoryId, this.labelId, this.createdAt);
+  CreateRecordReq(
+      this.amount, this.categoryId, this.labelId, this.month, this.day);
 
-  Map<String, Object> toMap() {
+  Map<String, Object?> toMap() {
     return {
       'amount': amount,
       'category_id': categoryId,
       'label_id': labelId,
-      'created_at': createdAt.toString()
+      'month': month,
+      'day': day
     };
   }
 }

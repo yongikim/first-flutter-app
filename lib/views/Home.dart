@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart' show Consumer, Provider;
 
-import 'MainAppBar.dart';
 import 'MainCategorySection.dart';
 import '../view_models/HomeViewModel.dart';
 
 class Home extends StatelessWidget {
   Home({Key? key, required this.title}) : super(key: key);
   final String title;
-
-  void _incrementCounter() async {
-    print('+');
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,22 +19,47 @@ class Home extends StatelessWidget {
         }
 
         final sections = vm.state.entries
-            .map((e) => MainCategorySection(e.key.toString(), e.value));
-        return Scaffold(
-          body: SafeArea(
-            child: CustomScrollView(
-              slivers: [
-                MainAppBar(title: 'Main App Bar'),
-                sections.first,
-              ],
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: _incrementCounter,
-            tooltip: 'Increment',
-            child: Icon(Icons.add),
-          ),
-        );
+            .map((e) => MainCategorySection(e.key.toString(), e.value))
+            .toList();
+
+        return DefaultTabController(
+            length: sections.length,
+            child: NestedScrollView(
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
+                  return <Widget>[
+                    SliverOverlapAbsorber(
+                        handle: NestedScrollView.sliverOverlapAbsorberHandleFor(
+                            context),
+                        sliver: SliverAppBar(
+                            title: Text(
+                              title,
+                              style: TextStyle(
+                                color:
+                                    Theme.of(context).textTheme.overline?.color,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            pinned: false,
+                            snap: false,
+                            floating: false,
+                            backgroundColor: Theme.of(context).canvasColor,
+                            foregroundColor: Theme.of(context).canvasColor,
+                            forceElevated: innerBoxIsScrolled,
+                            bottom: TabBar(
+                                isScrollable: true,
+                                tabs: vm.state.entries
+                                    .map((e) => Tab(
+                                        child: Text(e.value.title,
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyText1!
+                                                    .color))))
+                                    .toList())))
+                  ];
+                },
+                body: TabBarView(children: sections)));
       },
     );
   }

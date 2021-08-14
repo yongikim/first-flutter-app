@@ -1,24 +1,43 @@
 import 'package:first_flutter_app/models/Record.dart';
+import 'package:first_flutter_app/repositories/CategoryRepository.dart';
+import 'package:first_flutter_app/repositories/CategoryRepositoryInterface.dart';
+import 'package:first_flutter_app/repositories/LabelRepository.dart';
+import 'package:first_flutter_app/repositories/LabelRepositoryInterface.dart';
 import 'package:first_flutter_app/repositories/RecordRepository.dart';
 import 'package:first_flutter_app/repositories/RecordRepositoryInterface.dart';
 import 'package:first_flutter_app/view_models/Category.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 
 import 'CardState.dart';
 import 'Label.dart';
 
-class HomeViewModel extends ChangeNotifier {
-  late final Map<int, List<CardState>> _state;
-  Map<int, List<CardState>> get state => _state;
+class StateBody {
+  String _title;
+  String get title => _title;
 
-  late final bool _isLoading;
+  List<CardState> _cards;
+  List<CardState> get cards => _cards;
+
+  StateBody(this._title, this._cards);
+}
+
+class HomeViewModel extends ChangeNotifier {
+  final Map<int, StateBody> _state = {};
+  Map<int, StateBody> get state => _state;
+
+  late bool _isLoading;
   bool get isLoading => _isLoading;
 
   late final RecordRepositoryInterface _recordRep;
+  late final CategoryRepositoryInterface _categoryRep;
+  late final LabelRepositoryInterface _labelRep;
 
   HomeViewModel() {
     _recordRep = RecordRepository();
+    _categoryRep = CategoryRepository();
+    _labelRep = LabelRepository();
 
     _isLoading = true;
     _init().then((_) {
@@ -29,52 +48,65 @@ class HomeViewModel extends ChangeNotifier {
 
   // Get data from DB
   Future<HomeViewModel?> _init() async {
-    // TODO: 今月分のRecordの合計をcategoryとlabel毎に表示
     final int month = DateTime.now().month;
     final List<Record> records = await _recordRep.getRecordsByMonth(month, 0);
 
-    final Map<int, List<CardState>> state = {};
+    if (records.isEmpty) {
+      for (int i = 0; i < 3; i++) {
+        // TODO: Create Category
+        final Category category = await _categoryRep.create('New Category $i');
 
-    await Future.delayed(Duration(milliseconds: 3000));
+        for (int j = 0; j < 3; j++) {
+          // TODO: Create Label
+          final Label label = await _labelRep.create('New Label $j');
 
-    for (int i = 0; i < 5; i++) {
-      final int categoryId = i;
+          // TODO: Create Record
+          final int day = DateTime.now().day;
+          final CreateRecordReq req =
+              CreateRecordReq(0, category.id, label.id, month, day);
+          final Record record = await _recordRep.create(req);
 
-      state[categoryId] = List.generate(5, (j) {
-        // Category
-        final String categoryName = 'Category Name $i';
-        final Category category = Category(i, categoryName);
-
-        // Label
-        final int labelId = int.tryParse(categoryId.toString() + j.toString())!;
-        final String labelName = 'Label Name $j';
-        final Label label = Label(labelId, labelName);
-
-        // Statistics
-        final double todayTotal = 0;
-        final double lastMonthTotal = 0;
-        final double thisMonthTotal = 0;
-
-        // cardState
-        return CardState(
-            category, label, todayTotal, lastMonthTotal, thisMonthTotal);
-      });
-
-      this._state = state;
-
-      return this;
+          records.add(record);
+        }
+      }
     }
+
+    print(records.map((r) => r.toMap()));
+
+    for (Record record in records) {
+      final int categoryId = record.category.id;
+      final Category category = Category(categoryId, record.category.name);
+      final Label label = Label(record.label.id, record.label.name);
+      final CardState cardState =
+          CardState(category, label, record.amount, 0, 0);
+
+      state.putIfAbsent(categoryId, () => StateBody(category.name, []));
+      StateBody stateBody = state[categoryId]!;
+
+      final CardState? targetCard = stateBody.cards
+          .firstWhereOrNull((c) => c.label.id == cardState.label.id);
+      if (targetCard == null) {
+        stateBody.cards.add(cardState);
+      } else {
+        targetCard.todayTotal += cardState.todayTotal;
+      }
+    }
+
+    return this;
   }
 
   Future add(int categoryId, int labelId, double value) async {
-    final createdAt = DateTime.now();
-    final record = CreateRecordRequest(value, categoryId, labelId, createdAt);
+    final DateTime now = DateTime.now();
+    final int month = now.month;
+    final int day = now.day;
+    final record = CreateRecordReq(value, categoryId, labelId, month, day);
 
     // This does not block UI transition.
     // It updates the UI when creating Record is complete after transition.
-    _recordRep.create(record).then((CreateRecordResponse _res) {
-      final cardState =
-          state[categoryId]?.firstWhere((card) => card.label.id == labelId);
+    _recordRep.create(record).then((Record _res) {
+      final cardState = state[categoryId]
+          ?.cards
+          .firstWhere((card) => card.label.id == labelId);
       if (cardState != null) {
         cardState.todayTotal += value;
         notifyListeners();

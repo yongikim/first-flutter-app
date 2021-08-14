@@ -11,12 +11,12 @@ class RecordRepository implements RecordRepositoryInterface {
     _DBService = DBService();
   }
 
-  Future<CreateRecordResponse> create(CreateRecordRequest record) async {
-    if (record.amount == 0) {
-      throw ZeroException();
-    }
+  Future<Record> create(CreateRecordReq req) async {
+    // if (req.amount == 0) {
+    //   throw ZeroException();
+    // }
 
-    return _DBService.insertRecord(record);
+    return _DBService.insertRecord(req);
   }
 
   Future<List<Record>> getRecordsByMonth(int month, int categoryId,
