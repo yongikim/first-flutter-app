@@ -8,18 +8,20 @@ abstract class RecordRepositoryInterface {
 
 class CreateRecordReq {
   final double amount;
-  final int categoryId;
+  final int mainCategoryId;
+  final int? subCategoryId;
   final int labelId;
   final int month;
   final int day;
 
   CreateRecordReq(
-      this.amount, this.categoryId, this.labelId, this.month, this.day);
+      this.amount, this.mainCategoryId, this.subCategoryId,this.labelId, this.month, this.day);
 
   Map<String, Object?> toMap() {
     return {
       'amount': amount,
-      'category_id': categoryId,
+      'main_category_id': mainCategoryId,
+      'sub_category_id': subCategoryId,
       'label_id': labelId,
       'month': month,
       'day': day

@@ -10,7 +10,7 @@ class Detail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final String heroTag = this.cardState.category.id.toString() +
+    final String heroTag = this.cardState.mainCategory.id.toString() +
         this.cardState.label.id.toString();
     final String cardName = this.cardState.label.name;
     double statusBarHeight = MediaQuery.of(context).padding.top;

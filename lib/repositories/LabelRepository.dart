@@ -1,6 +1,6 @@
 import 'package:first_flutter_app/db/DBService.dart';
 import 'package:first_flutter_app/db/DBServiceInterface.dart';
-import 'package:first_flutter_app/view_models/Label.dart';
+import 'package:first_flutter_app/models/Label.dart';
 
 import 'LabelRepositoryInterface.dart';
 

@@ -1,19 +1,22 @@
-import 'Category.dart';
-import 'Label.dart';
+import '../models/MainCategory.dart';
+import '../models/SubCategory.dart';
+import '../models/Label.dart';
 
 class CardState {
-  Category category;
+  MainCategory mainCategory;
+  SubCategory subCategory;
   Label label;
   double todayTotal;
   double thisMonthTotal;
   double lastMonthTotal;
 
-  CardState(this.category, this.label, this.todayTotal, this.thisMonthTotal,
+  CardState(this.mainCategory, this.subCategory, this.label, this.todayTotal, this.thisMonthTotal,
       this.lastMonthTotal);
 
   Map<String, Object?> toMap() {
     return {
-      'category_Id': category.id,
+      'main_category_Id': mainCategory.id,
+      'sub_category_Id': subCategory.id,
       'label_id': label.id,
       'todayTotal': todayTotal,
       'thisMonthTotal': thisMonthTotal,

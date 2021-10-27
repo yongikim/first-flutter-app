@@ -18,7 +18,8 @@ class MainCategorySectionCard extends StatefulWidget {
 }
 
 class MainCategorySectionCardState extends State<MainCategorySectionCard> {
-  var _hasPadding = false;
+  bool _hasPadding = false;
+  Map<String, double> _tapDownPosition = {'x': 0, 'y': 0};
 
   void onTap() {
     setState(() {
@@ -33,16 +34,26 @@ class MainCategorySectionCardState extends State<MainCategorySectionCard> {
         pageBuilder: (_, Animation<double> animation, ___) {
           return FadeTransition(
             opacity: animation,
-            child: Record(widget.cardState.category.id, widget.cardState),
+            child: Record(widget.cardState.mainCategory.id, widget.cardState.subCategory.id, widget.cardState),
           );
         },
       ),
     );
   }
 
-  void onTapDown(TapDownDetails _) {
+  void onTapDown(TapDownDetails tapDownDetails) {
     setState(() {
       _hasPadding = true;
+      _tapDownPosition = {
+        'x': tapDownDetails.localPosition.dx,
+        'y': tapDownDetails.globalPosition.dy
+      };
+    });
+  }
+
+  void onLongPressEnd(LongPressEndDetails _) {
+    setState(() {
+      _hasPadding = false;
     });
   }
 
@@ -50,6 +61,18 @@ class MainCategorySectionCardState extends State<MainCategorySectionCard> {
     setState(() {
       _hasPadding = false;
     });
+  }
+
+  void onLongPress() {
+    double left = _tapDownPosition['x'] ?? 0;
+    double top = _tapDownPosition['y'] ?? 0;
+    showMenu(
+        context: context,
+        position: RelativeRect.fromLTRB(left, top, left, top),
+        items: [
+          PopupMenuItem(child: Text("Item1")),
+          PopupMenuItem(child: Text("Item2"))
+        ]);
   }
 
   void onDetailButtonTap() {
@@ -70,7 +93,7 @@ class MainCategorySectionCardState extends State<MainCategorySectionCard> {
   @override
   Widget build(BuildContext context) {
     final String cardName = widget.cardState.label.name;
-    final String heroTag = widget.cardState.category.id.toString() +
+    final String heroTag = widget.cardState.mainCategory.id.toString() +
         widget.cardState.label.id.toString();
     double todayTotal = widget.cardState.todayTotal;
     double thisMonthTotal = widget.cardState.thisMonthTotal;
@@ -87,8 +110,10 @@ class MainCategorySectionCardState extends State<MainCategorySectionCard> {
           padding: EdgeInsets.all(_hasPadding ? 4 : 0),
           child: GestureDetector(
             onTapDown: onTapDown,
+            onLongPressEnd: onLongPressEnd,
             onTap: onTap,
             onTapCancel: onTapCancel,
+            onLongPress: onLongPress,
             child: Card(
               clipBehavior: Clip.antiAlias,
               margin: EdgeInsetsDirectional.only(

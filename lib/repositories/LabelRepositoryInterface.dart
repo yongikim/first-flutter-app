@@ -1,4 +1,4 @@
-import 'package:first_flutter_app/view_models/Label.dart';
+import 'package:first_flutter_app/models/Label.dart';
 
 abstract class LabelRepositoryInterface {
   Future<Label> create(String name);

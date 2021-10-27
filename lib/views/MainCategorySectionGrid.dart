@@ -14,6 +14,7 @@ class MainCategorySectionGrid extends StatelessWidget {
     final cardWidgets = this.cardStates.asMap().entries.map((e) {
       final cardState = e.value;
       final index = e.key;
+
       return MainCategorySectionCard(this.mainCategoryId, cardState, index);
     }).toList();
 

@@ -1,34 +1,34 @@
 import 'package:first_flutter_app/db/DBService.dart';
 import 'package:first_flutter_app/db/DBServiceInterface.dart';
-import 'package:first_flutter_app/view_models/Category.dart';
+import 'package:first_flutter_app/models/MainCategory.dart';
 
-import 'CategoryRepositoryInterface.dart';
+import 'MainCategoryRepositoryInterface.dart';
 
-class CategoryRepository implements CategoryRepositoryInterface {
+class MainCategoryRepository implements MainCategoryRepositoryInterface {
   // ignore: non_constant_identifier_names
   late final DBServiceInterface _DBService;
 
-  CategoryRepository() {
+  MainCategoryRepository() {
     _DBService = DBService();
   }
 
-  Future<Category> create(String name) async {
+  Future<MainCategory> create(String name) async {
     if (name.isEmpty) {
       throw EmptyCategoryNameException();
     }
 
-    return _DBService.insertCategory(name);
+    return _DBService.insertMainCategory(name);
   }
 
-  Future<Category> findById(int id) async {
-    return _DBService.findCategoryById(id);
+  Future<MainCategory> findById(int id) async {
+    return _DBService.findMainCategoryById(id);
   }
 }
 
 class EmptyCategoryNameException implements Exception {
   late String _message;
 
-  EmptyCategoryNameException([String message = 'Label name is empty!']) {
+  EmptyCategoryNameException([String message = 'Category name is empty!']) {
     _message = message;
   }
 

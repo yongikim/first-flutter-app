@@ -3,8 +3,6 @@ import 'package:first_flutter_app/views/MainCategorySectionGrid.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../view_models/CardState.dart';
-
 class MainCategorySection extends StatelessWidget {
   final String title;
   final StateBody body;
@@ -27,7 +25,7 @@ class MainCategorySection extends StatelessWidget {
                           context)),
                   SliverPadding(
                       padding: const EdgeInsets.only(
-                          top: 8.0, left: 2.0, right: 2.0),
+                          top: 8.0, left: 1.0, right: 1.0),
                       sliver:
                           MainCategorySectionGrid(this.title, this.body.cards))
                 ],

@@ -4,24 +4,40 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
-import '../view_models/CardState.dart';
 import '../view_models/HomeViewModel.dart';
 
-class Record extends StatelessWidget {
+class NewRecord extends StatefulWidget {
   final int mainCategoryId;
-  final int subCategoryId;
-  final CardState cardState;
+  final int? subCategoryId;
 
-  Record(this.mainCategoryId, this.subCategoryId, this.cardState);
+  NewRecord({required this.mainCategoryId, this.subCategoryId});
+
+  @override
+  _NewRecordState createState() => _NewRecordState();
+}
+
+class _NewRecordState extends State<NewRecord> {
+  String _newLabelName = 'New Label';
+  bool _isTransitionComplete = false;
+
+  void _completeTransition() {
+    setState(() {
+      _isTransitionComplete = true;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _completeTransition());
+  }
 
   @override
   Widget build(BuildContext context) {
-    final String heroTag =
-        this.mainCategoryId.toString() + this.cardState.label.id.toString();
-    final String cardName = this.cardState.label.name;
-    final double todayTotal = this.cardState.todayTotal;
-    final double thisMonthTotal = this.cardState.thisMonthTotal;
-    final double lastMonthTotal = this.cardState.lastMonthTotal;
+    final String heroTag = widget.mainCategoryId.toString() + 'NewRecord';
+    final double todayTotal = 0;
+    final double thisMonthTotal = 0;
+    final double lastMonthTotal = 0;
 
     double _ = MediaQuery.of(context).padding.top;
 
@@ -29,10 +45,14 @@ class Record extends StatelessWidget {
       Navigator.of(context).pop();
     }
 
+    void onChanged(String text) {
+      _newLabelName = text;
+    }
+
     void onFieldSubmitted(String value) async {
       var addValue = double.tryParse(value) ?? 0;
       await Provider.of<HomeViewModel>(context, listen: false)
-          .add(this.mainCategoryId, this.subCategoryId, this.cardState.label.id, addValue);
+          .create(widget.mainCategoryId, widget.subCategoryId, _newLabelName, addValue);
 
       Navigator.of(context).pop();
     }
@@ -68,8 +88,9 @@ class Record extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text(
-                          cardName,
+                        TextField(
+                          decoration: InputDecoration(hintText: 'Label Name'),
+                          onChanged: onChanged,
                           style: TextStyle(
                             fontSize: 20,
                             color: Theme.of(context).textTheme.bodyText1!.color,
@@ -103,7 +124,7 @@ class Record extends StatelessWidget {
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.end,
                           textAlignVertical: TextAlignVertical.bottom,
-                          autofocus: true,
+                          autofocus: _isTransitionComplete,
                           onFieldSubmitted: onFieldSubmitted,
                           decoration: InputDecoration(
                             focusedBorder: UnderlineInputBorder(
