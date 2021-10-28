@@ -6,6 +6,18 @@ abstract class RecordRepositoryInterface {
       [int labelId]);
 }
 
+class UpdateLabelReq {
+  final String name;
+
+  UpdateLabelReq(this.name);
+
+  Map<String, Object?> toMap() {
+    return {
+      'name': name,
+    };
+  }
+}
+
 class CreateRecordReq {
   final double amount;
   final int mainCategoryId;
@@ -14,8 +26,8 @@ class CreateRecordReq {
   final int month;
   final int day;
 
-  CreateRecordReq(
-      this.amount, this.mainCategoryId, this.subCategoryId,this.labelId, this.month, this.day);
+  CreateRecordReq(this.amount, this.mainCategoryId, this.subCategoryId,
+      this.labelId, this.month, this.day);
 
   Map<String, Object?> toMap() {
     return {

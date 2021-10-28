@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:first_flutter_app/db/DBServiceInterface.dart';
+import 'package:first_flutter_app/main.dart';
 import 'package:first_flutter_app/models/Record.dart';
+import 'package:first_flutter_app/repositories/LabelRepository.dart';
 import 'package:first_flutter_app/repositories/RecordRepositoryInterface.dart';
 import 'package:first_flutter_app/models/MainCategory.dart';
 import 'package:first_flutter_app/models/SubCategory.dart';
@@ -16,7 +18,7 @@ class DBService implements DBServiceInterface {
     if (db != null) return db;
 
     final String databasesPath = await getDatabasesPath();
-    final String path = databasesPath + 'dev50.db';
+    final String path = databasesPath + 'dev53.db';
 
     return await openDatabase(path, version: 1, onCreate: onCreate);
   }
@@ -61,14 +63,13 @@ class DBService implements DBServiceInterface {
     ''', [id]);
 
     print(result);
-    print(result.first);
 
     final MainCategory mainCategory = MainCategory(
         result.first['main_category_id'], result.first['main_category_name']);
     final SubCategory subCategory = SubCategory(
         result.first['sub_category_id'], result.first['sub_category_name']);
-    final Label label =
-        Label(result.first['label_id'], result.first['label_name']);
+    final Label label = Label(result.first['label_id'],
+        result.first['label_name'], mainCategory.id, subCategory.id);
     return Record(
         result.first['id'],
         result.first['amount'],
@@ -112,7 +113,8 @@ class DBService implements DBServiceInterface {
           result[i]['main_category_id'], result[i]['main_category_name']);
       final SubCategory subCategory = SubCategory(
           result[i]['sub_category_id'], result[i]['sub_category_name']);
-      final Label label = Label(result[i]['label_id'], result[i]['label_name']);
+      final Label label = Label(result[i]['label_id'], result[i]['label_name'],
+          mainCategory.id, subCategory.id);
       return Record(result.first['id'], result[i]['amount'], result[i]['month'],
           result[i]['day'], mainCategory, subCategory, label);
     });
@@ -166,10 +168,10 @@ class DBService implements DBServiceInterface {
     return SubCategory(result.first['id'], result.first['name']);
   }
 
-  Future<Label> insertLabel(String name) async {
+  Future<Label> insertLabel(CreateLabelReq req) async {
     final Database db = await database;
 
-    final int id = await db.insert('label', {'name': name});
+    final int id = await db.insert('label', req.toMap());
 
     return await findLabelById(id);
   }
@@ -179,7 +181,8 @@ class DBService implements DBServiceInterface {
 
     final List<Map<String, dynamic>> result =
         await db.query('label', where: 'id = ?', whereArgs: [id]);
-    return Label(result.first['id'], result.first['name']);
+    return Label(result.first['id'], result.first['name'],
+        result.first['main_category_id'], result.first['sub_category_id']);
   }
 
   Future<Label> getUntitledLabel() async {
@@ -187,7 +190,15 @@ class DBService implements DBServiceInterface {
 
     final List<Map<String, dynamic>> result =
         await db.query('label', where: 'name = ?', whereArgs: ['untitled']);
-    return Label(result.first['id'], result.first['name']);
+    return Label(result.first['id'], result.first['name'],
+        result.first['main_category_id'], result.first['sub_category_id']);
+  }
+
+  Future<int> updateLabel(int id, UpdateLabelReq req) async {
+    final Database db = await database;
+
+    return await db
+        .update('label', req.toMap(), where: 'id = ?', whereArgs: [id]);
   }
 }
 
@@ -219,24 +230,26 @@ FutureOr<void> onCreate(Database db, int version) async {
   await db.execute('''
       CREATE TABLE label (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL
+        name TEXT NOT NULL,
+        main_category_id INTEGER,
+        sub_category_id INTEGER
       );
   ''');
-  await db.execute('''
-      INSERT INTO main_category (name)
-      VALUES ('untitled');
-  ''');
-  await db.execute('''
-      INSERT INTO sub_category (name)
-      VALUES ('untitled');
-  ''');
-  await db.execute('''
-      INSERT INTO label (name)
-      VALUES ('untitled');
-  ''');
+  // await db.execute('''
+  //     INSERT INTO main_category (name)
+  //     VALUES ('untitled');
+  // ''');
+  // await db.execute('''
+  //     INSERT INTO sub_category (name)
+  //     VALUES ('untitled');
+  // ''');
+  // await db.execute('''
+  //     INSERT INTO label (name)
+  //     VALUES ('untitled');
+  // ''');
 
-  // await db.insert('main_category', {'name': 'untitled'});
-  // await db.insert('sub_category', {'name': 'untitled'});
+  await db.insert('main_category', {'name': 'untitled'});
+  await db.insert('sub_category', {'name': 'untitled'});
   // await db.insert('label', {'name': 'untitled'});
 
   // final DateTime now = DateTime.now();

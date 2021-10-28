@@ -72,11 +72,13 @@ class HomeViewModel extends ChangeNotifier {
             await _subCategoryRep.create('New Category $i');
 
         for (int j = 0; j < 3; j++) {
-          final Label label = await _labelRep.create('New Label $j');
+          final CreateLabelReq labelReq =
+              CreateLabelReq('New Label $j', mainCategory.id, subCategory.id);
+          final Label label = await _labelRep.create(labelReq);
 
           final int day = DateTime.now().day;
-          final CreateRecordReq req =
-              CreateRecordReq(0, mainCategory.id, subCategory.id, label.id, month, day);
+          final CreateRecordReq req = CreateRecordReq(
+              0, mainCategory.id, subCategory.id, label.id, month, day);
           final Record record = await _recordRep.create(req);
 
           records.add(record);
@@ -93,9 +95,10 @@ class HomeViewModel extends ChangeNotifier {
           MainCategory(mainCategoryId, record.mainCategory.name);
       final SubCategory subCategory =
           SubCategory(subCategoryId, record.subCategory.name);
-      final Label label = Label(record.label.id, record.label.name);
-      final CardState cardState =
-          CardState(mainCategory, subCategory, label, record.amount, 0, 0);
+      final Label label = Label(
+          record.label.id, record.label.name, mainCategoryId, subCategoryId);
+      final CardState cardState = CardState(
+          mainCategory, subCategory, label, record.amount, record.amount, 0);
 
       state.putIfAbsent(mainCategoryId, () => StateBody(mainCategory.name, []));
       StateBody stateBody = state[mainCategoryId]!;
@@ -106,17 +109,20 @@ class HomeViewModel extends ChangeNotifier {
         stateBody.cards.add(cardState);
       } else {
         targetCard.todayTotal += cardState.todayTotal;
+        targetCard.thisMonthTotal += cardState.thisMonthTotal;
       }
     }
 
     return this;
   }
 
-  Future add(int mainCategoryId, int subCategoryId, int labelId, double value) async {
+  Future add(
+      int mainCategoryId, int subCategoryId, int labelId, double value) async {
     final DateTime now = DateTime.now();
     final int month = now.month;
     final int day = now.day;
-    final record = CreateRecordReq(value, mainCategoryId, subCategoryId, labelId, month, day);
+    final record = CreateRecordReq(
+        value, mainCategoryId, subCategoryId, labelId, month, day);
 
     // This does not block UI transition.
     // It updates the UI when creating Record is complete after transition.
@@ -126,6 +132,7 @@ class HomeViewModel extends ChangeNotifier {
           .firstWhere((card) => card.label.id == labelId);
       if (cardState != null) {
         cardState.todayTotal += value;
+        cardState.thisMonthTotal += value;
         notifyListeners();
       }
     }).catchError((e) {
@@ -141,7 +148,6 @@ class HomeViewModel extends ChangeNotifier {
     final int day = now.day;
 
     // Get Label and Category
-    final Label label = await _labelRep.create(newLabelName);
     final MainCategory mainCategory =
         await _mainCategoryRep.findById(mainCategoryId);
 
@@ -152,15 +158,30 @@ class HomeViewModel extends ChangeNotifier {
     final SubCategory subCategory =
         await _subCategoryRep.findById(subCategoryId);
 
+    final CreateLabelReq labelReq =
+        CreateLabelReq(newLabelName, mainCategoryId, subCategoryId);
+    final Label label = await _labelRep.create(labelReq);
+
     // Create Record
-    final CreateRecordReq req =
-        CreateRecordReq(value, mainCategoryId, subCategoryId, label.id, month, day);
+    final CreateRecordReq req = CreateRecordReq(
+        value, mainCategoryId, subCategoryId, label.id, month, day);
     final Record record = await _recordRep.create(req);
 
     // Create Card
-    final CardState newCardState =
-        CardState(mainCategory, subCategory, label, record.amount, 0, 0);
+    final CardState newCardState = CardState(
+        mainCategory, subCategory, label, record.amount, record.amount, 0);
     _state[mainCategoryId]?._cards.add(newCardState);
+
+    notifyListeners();
+  }
+
+  Future updateLabelName(int id, String name) async {
+    final Label updatedLabel = await _labelRep.updateLabelName(id, name);
+    final int mainCategoryId = updatedLabel.mainCategoryId!;
+    state[mainCategoryId]
+        ?._cards
+        .firstWhere((card) => card.label.id == id)
+        .label = updatedLabel;
 
     notifyListeners();
   }

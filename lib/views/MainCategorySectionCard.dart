@@ -1,5 +1,7 @@
+import 'package:first_flutter_app/view_models/HomeViewModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../view_models/CardState.dart';
 import 'Detail.dart';
@@ -34,7 +36,8 @@ class MainCategorySectionCardState extends State<MainCategorySectionCard> {
         pageBuilder: (_, Animation<double> animation, ___) {
           return FadeTransition(
             opacity: animation,
-            child: Record(widget.cardState.mainCategory.id, widget.cardState.subCategory.id, widget.cardState),
+            child: Record(widget.cardState.mainCategory.id,
+                widget.cardState.subCategory.id, widget.cardState),
           );
         },
       ),
@@ -131,34 +134,33 @@ class MainCategorySectionCardState extends State<MainCategorySectionCard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      cardName,
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Theme.of(context).textTheme.bodyText1!.color,
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 4,
-                    ),
-                    Text(
-                      'This month $thisMonthTotal',
-                      style: TextStyle(
-                        color: Theme.of(context).cardTheme.color,
-                      ),
-                    ),
-                    Text(
-                      'Last month $lastMonthTotal',
-                      style: TextStyle(
-                        color: Theme.of(context).cardTheme.color,
-                      ),
-                    ),
-                    Text(
-                      'Today $todayTotal',
-                      style: TextStyle(
-                        color: Theme.of(context).cardTheme.color,
-                      ),
-                    ),
+                    Text(cardName,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 16,
+                            color:
+                                Theme.of(context).textTheme.bodyText1!.color)),
+                    // TextField(
+                    //   enabled: false,
+                    //   onSubmitted: onLabelNameSubmitted,
+                    //   decoration: InputDecoration(
+                    //       hintStyle: TextStyle(
+                    //           height: 0.5,
+                    //           fontSize: 16,
+                    //           color:
+                    //               Theme.of(context).textTheme.bodyText1!.color),
+                    //       hintText: cardName,
+                    //       border: InputBorder.none),
+                    // ),
+                    Spacer(),
+                    Spacer(),
+                    Center(
+                        child: Text(thisMonthTotal.toString(),
+                            style: TextStyle(
+                              fontSize: 36,
+                              color:
+                                  Theme.of(context).textTheme.bodyText1!.color,
+                            ))),
                     Spacer(),
                     Center(
                       child: MaterialButton(

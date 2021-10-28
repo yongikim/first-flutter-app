@@ -31,10 +31,21 @@ class Record extends StatelessWidget {
 
     void onFieldSubmitted(String value) async {
       var addValue = double.tryParse(value) ?? 0;
-      await Provider.of<HomeViewModel>(context, listen: false)
-          .add(this.mainCategoryId, this.subCategoryId, this.cardState.label.id, addValue);
+      await Provider.of<HomeViewModel>(context, listen: false).add(
+          this.mainCategoryId,
+          this.subCategoryId,
+          this.cardState.label.id,
+          addValue);
 
       Navigator.of(context).pop();
+    }
+
+    void onLabelNameSubmitted(String? name) async {
+      if (name == null) {
+        return;
+      }
+      await Provider.of<HomeViewModel>(context, listen: false)
+          .updateLabelName(cardState.label.id, name);
     }
 
     return Scaffold(
@@ -68,12 +79,14 @@ class Record extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.max,
                       children: [
-                        Text(
-                          cardName,
+                        TextFormField(
+                          initialValue: cardName,
                           style: TextStyle(
-                            fontSize: 20,
-                            color: Theme.of(context).textTheme.bodyText1!.color,
-                          ),
+                              fontSize: 24,
+                              color:
+                                  Theme.of(context).textTheme.bodyText1!.color),
+                          decoration: InputDecoration(border: InputBorder.none),
+                          onFieldSubmitted: onLabelNameSubmitted,
                         ),
                         const SizedBox(
                           height: 4,
