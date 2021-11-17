@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart' show Consumer, Provider;
 
+import 'HomeTabBar.dart';
 import 'MainCategorySection.dart';
 import '../view_models/HomeViewModel.dart';
 import 'NewRecord.dart';
@@ -85,20 +86,7 @@ class Home extends StatelessWidget {
                                   preferredSize: Size.fromHeight(50),
                                   child: (Row(children: [
                                     Expanded(
-                                        child: Container(
-                                            child: TabBar(
-                                                isScrollable: true,
-                                                tabs: vm.state.entries
-                                                    .map((e) => Tab(
-                                                        child: Text(
-                                                            e.value.title,
-                                                            style: TextStyle(
-                                                                color: Theme.of(
-                                                                        context)
-                                                                    .textTheme
-                                                                    .bodyText1!
-                                                                    .color))))
-                                                    .toList()))),
+                                        child: Container(child: HomeTabBar())),
                                     Container(
                                         decoration: BoxDecoration(
                                             color:

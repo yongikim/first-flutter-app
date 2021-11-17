@@ -18,6 +18,18 @@ class UpdateLabelReq {
   }
 }
 
+class UpdateMainCategoryReq {
+  final String name;
+
+  UpdateMainCategoryReq(this.name);
+
+  Map<String, Object?> toMap() {
+    return {
+      'name': name,
+    };
+  }
+}
+
 class CreateRecordReq {
   final double amount;
   final int mainCategoryId;

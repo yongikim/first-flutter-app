@@ -1,7 +1,5 @@
-import 'package:first_flutter_app/view_models/HomeViewModel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../view_models/CardState.dart';
 import 'Detail.dart';

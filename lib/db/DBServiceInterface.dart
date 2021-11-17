@@ -18,4 +18,5 @@ abstract class DBServiceInterface {
   Future<Label> insertLabel(CreateLabelReq req);
   Future<Label> findLabelById(int id);
   Future<int> updateLabel(int id, UpdateLabelReq req);
+  Future<int> updateMainCategory(int id, UpdateMainCategoryReq req);
 }

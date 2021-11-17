@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:first_flutter_app/db/DBServiceInterface.dart';
-import 'package:first_flutter_app/main.dart';
 import 'package:first_flutter_app/models/Record.dart';
 import 'package:first_flutter_app/repositories/LabelRepository.dart';
 import 'package:first_flutter_app/repositories/RecordRepositoryInterface.dart';
@@ -199,6 +198,13 @@ class DBService implements DBServiceInterface {
 
     return await db
         .update('label', req.toMap(), where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> updateMainCategory(int id, UpdateMainCategoryReq req) async {
+    final Database db = await database;
+
+    return await db
+        .update('main_category', req.toMap(), where: 'id = ?', whereArgs: [id]);
   }
 }
 
