@@ -16,11 +16,11 @@ class Home extends StatelessWidget {
       print('main category add');
     }
 
-    void onPressed() {
+    void onFloatingActionButtonPressed() {
       final vm = Provider.of<HomeViewModel>(context, listen: false);
       final mainCategoryId = vm.state.entries.toList()[vm.currentIndex].key;
       final subCategoryId = null;
-      print('+');
+
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -122,7 +122,7 @@ class Home extends StatelessWidget {
                           .toString() +
                       'NewRecord',
                   child: Icon(Icons.add),
-                  onPressed: onPressed)));
+                  onPressed: onFloatingActionButtonPressed)));
     });
   }
 }

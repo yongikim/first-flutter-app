@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'MainCategoryEditor.dart';
+
 class HomeTabBar extends StatefulWidget {
   HomeTabBar();
 
@@ -12,7 +14,6 @@ class HomeTabBar extends StatefulWidget {
 
 class HomeTabBarState extends State<HomeTabBar> {
   int _currentIndex = 0;
-  bool _isEditing = false;
 
   void onTap(int index) {
     setState(() {
@@ -20,15 +21,22 @@ class HomeTabBarState extends State<HomeTabBar> {
     });
   }
 
-  void onLongPress() {
-    print(this._currentIndex);
-    setState(() {
-      _isEditing = true;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    void onLongPress() {
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          opaque: false,
+          transitionDuration: Duration(milliseconds: 300),
+          pageBuilder: (_, Animation<double> animation, ___) {
+            return FadeTransition(
+                opacity: animation, child: MainCategoryEditor());
+          },
+        ),
+      );
+    }
+
     return Consumer<HomeViewModel>(builder: (context, homeViewModel, child) {
       final vm = Provider.of<HomeViewModel>(context);
 
@@ -43,15 +51,7 @@ class HomeTabBarState extends State<HomeTabBar> {
                               Theme.of(context).textTheme.bodyText1!.color))))
               .toList());
 
-      final Widget textField = TextFormField(
-        style: TextStyle(
-            fontSize: 24, color: Theme.of(context).textTheme.bodyText1!.color),
-        decoration: InputDecoration(border: InputBorder.none),
-      );
-
-      final Widget body = this._isEditing ? textField : tabBar;
-
-      return (GestureDetector(onLongPress: onLongPress, child: body));
+      return (GestureDetector(onLongPress: onLongPress, child: tabBar));
     });
   }
 }

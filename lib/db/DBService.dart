@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:path/path.dart' as p;
 
 import 'package:first_flutter_app/db/DBServiceInterface.dart';
 import 'package:first_flutter_app/models/Record.dart';
@@ -17,7 +18,7 @@ class DBService implements DBServiceInterface {
     if (db != null) return db;
 
     final String databasesPath = await getDatabasesPath();
-    final String path = databasesPath + 'dev53.db';
+    final String path = p.join(databasesPath, 'dev1.db');
 
     return await openDatabase(path, version: 1, onCreate: onCreate);
   }

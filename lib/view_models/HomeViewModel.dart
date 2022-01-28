@@ -185,4 +185,10 @@ class HomeViewModel extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  Future<MainCategory> getMainCategory(int id) async {
+    final MainCategory mainCategory = await _mainCategoryRep.findById(id);
+
+    return mainCategory;
+  }
 }
